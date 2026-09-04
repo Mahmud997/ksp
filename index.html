@@ -63,7 +63,7 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
    <span class="w-9 h-9 rounded-xl bg-[#f8edf3] flex items-center justify-center text-[#b07194]"><i class="fa-solid fa-sparkles"></i></span>
   </div>
   <label class="text-[11px] font-bold text-[#766a76]">Провайдер</label>
-  <select id="aiProvider" class="input mt-1 mb-3"><option value="gemini">Google Gemini</option><option value="deepseek">DeepSeek</option><option value="openai">OpenAI</option></select>
+  <select id="aiProvider" class="input mt-1 mb-3"><option value="gemini">Google Gemini</option><option value="deepseek">DeepSeek</option><option value="openai">OpenAI — GPT-5.6 Luna</option></select>
   <label class="text-[11px] font-bold text-[#766a76]">API Key</label>
   <div class="relative mt-1"><input id="apiKey" type="password" autocomplete="off" placeholder="Вставьте ключ…" class="input pr-11"><button type="button" onclick="toggleKeyVisibility()" class="absolute right-3 top-3 text-[#9b8c99]"><i id="eyeIcon" class="fa-solid fa-eye"></i></button></div>
   <p class="text-[10px] text-[#958894] mt-2"><i class="fa-solid fa-shield-halved mr-1"></i>Ключ хранится только в localStorage этого браузера.</p>
@@ -72,15 +72,30 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
  <div class="glass rounded-[24px] p-5">
   <div class="flex items-center gap-2 mb-4"><span class="w-8 h-8 rounded-xl bg-[#f1eafa] flex items-center justify-center text-[#8d80b1]"><i class="fa-solid fa-sliders"></i></span><h2 class="font-extrabold">Параметры урока</h2></div>
   <form id="ksptForm" onsubmit="generateLessonPlan(event)" class="space-y-3">
-   <div><label class="label text-[11px] font-bold">Язык урока</label><select id="lessonLanguage" class="input mt-1"><option value="Русский">Русский язык</option><option value="Казахский">Қазақ тілі</option><option value="Английский">English</option><option value="Узбекский (Кириллица)">Ўзбек тили (Кириллица)</option></select></div>
+   <div><label class="label text-[11px] font-bold">Язык урока</label><select id="lessonLanguage" class="input mt-1" onchange="applyLanguageUI()"><option value="Русский">Русский язык</option><option value="Казахский">Қазақ тілі</option><option value="Английский">English</option><option value="Узбекский (Кириллица)">Ўзбек тили (Кириллица)</option></select></div>
    <div class="grid grid-cols-2 gap-2"><div><label class="text-[11px] font-bold">Предмет</label><input id="subjectName" value="Английский язык" class="input mt-1"></div><div><label class="text-[11px] font-bold">Класс</label><input id="gradeLevel" value="7 класс" class="input mt-1"></div></div>
    <div><label class="text-[11px] font-bold">Цель обучения</label><input id="customObjective" placeholder="Например: 7.C2…" class="input mt-1"></div>
-   <div><label class="text-[11px] font-bold">Степень детализации</label><select id="detailLevel" class="input mt-1"><option value="Подробный">Подробный</option><option value="Краткий">Краткий</option></select></div>
+   <div>
+    <label class="text-[11px] font-bold">Степень детализации</label>
+    <select id="detailLevel" class="input mt-1" onchange="toggleDetailExtra()">
+     <option value="Подробный">Подробный — детальный КСП</option>
+     <option value="Краткий">Краткий — сжато и по делу</option>
+     <option value="Интеграция конспекта">Интеграция конспекта — КСП + полный конспект</option>
+     <option value="Семинар — полностью">Семинар — полностью — программа, сценарий, выступление и материалы</option>
+    </select>
+    <p id="detailHint" class="text-[10px] text-[#958894] mt-1.5">Подробный режим: расширенные действия педагога и учащихся, вопросы, задания и оценивание.</p>
+   </div>
+   <div id="notesBox" class="hidden rounded-2xl bg-[#fdf7fb] border border-[#eedde8] p-3">
+    <label class="text-[11px] font-bold">Конспект / материалы для интеграции</label>
+    <textarea id="lessonNotes" rows="5" class="input mt-1 resize-y" placeholder="Вставьте готовый конспект, тезисы, методические материалы или текст, который нужно встроить в КСП…"></textarea>
+    <p class="text-[10px] text-[#958894] mt-1">ИИ сохранит смысл вашего материала и интегрирует его в этапы КСП, не удаляя важные пункты.</p>
+   </div>
    <div><label class="text-[11px] font-bold">Формат урока</label><div id="typeButtons" class="grid grid-cols-2 gap-2 mt-1">
     <button type="button" class="type-btn active btn btn-soft text-[11px]" data-type="Стандартный урок" onclick="setLessonType(this)">Стандартный</button>
     <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Урок-игра / Интерактивный" onclick="setLessonType(this)">Урок-игра</button>
     <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Практический / Лабораторный" onclick="setLessonType(this)">Практический</button>
     <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Проектная деятельность" onclick="setLessonType(this)">Проектный</button>
+    <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Семинар / Тренинг" onclick="setLessonType(this)">Семинар / тренинг</button>
    </div><input type="hidden" id="lessonType" value="Стандартный урок"></div>
    <div><label class="text-[11px] font-bold">Тема урока *</label><textarea id="lessonTopic" required rows="3" placeholder="Например: Present Perfect vs Past Simple…" class="input mt-1 resize-y"></textarea></div>
    <div class="rounded-2xl bg-[#fff8fb] border border-[#f0e1e9] p-3 space-y-2">
@@ -126,95 +141,186 @@ document.addEventListener('DOMContentLoaded',()=>{
  const provider=localStorage.getItem('eduksp_provider'); if(provider) $('aiProvider').value=provider;
  try{historyData=JSON.parse(localStorage.getItem('eduksp_history')||'[]')}catch{historyData=[]}
  updateHistoryBadge();
+ toggleDetailExtra();
+ applyLanguageUI();
 });
+function applyLanguageUI(){
+ const lang=$('lessonLanguage').value;
+ const uz=lang==='Узбекский (Кириллица)';
+ if(uz){
+  $('subjectName').placeholder='Масалан: Информатика';
+  $('schoolName').placeholder='Масалан: 12-мактаб';
+  $('teacherName').placeholder='Ф.И.О. педагог';
+  $('lessonTopic').placeholder='Масалан: Ахборот хавфсизлиги…';
+ }else if(lang==='Казахский'){
+  $('subjectName').placeholder='Мысалы: Информатика'; $('schoolName').placeholder='Мысалы: №12 мектеп'; $('teacherName').placeholder='Педагогтің Т.А.Ә.'; $('lessonTopic').placeholder='Мысалы: Ақпараттық қауіпсіздік…';
+ }else if(lang==='Английский'){
+  $('subjectName').placeholder='Example: Computer Science'; $('schoolName').placeholder='Example: School No. 12'; $('teacherName').placeholder='Teacher name'; $('lessonTopic').placeholder='Example: Information security…';
+ }else{
+  $('subjectName').placeholder='Например: Информатика'; $('schoolName').placeholder='Школа №…'; $('teacherName').placeholder='Иванов И.И.'; $('lessonTopic').placeholder='Например: Информационная безопасность…';
+ }
+}
 function toggleKeyVisibility(){const i=$('apiKey');i.type=i.type==='password'?'text':'password';$('eyeIcon').className=i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash'}
 function setLessonType(btn){document.querySelectorAll('.type-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$('lessonType').value=btn.dataset.type}
 function toggleLiveEdit(){isEditing=!isEditing;const d=$('documentPreview'),b=$('editToggleBtn');d.contentEditable=isEditing?'true':'false';$('editText').textContent=isEditing?'Сохранить правки':'Редактировать';b.classList.toggle('bg-[#ead9e3]',isEditing)}
 function getVisualImageUrl(keywords){const prompt=encodeURIComponent((keywords||'educational illustration diagram')+' educational diagram clean pastel vector, no text');return `https://image.pollinations.ai/prompt/${prompt}?width=800&height=440&nologo=true`}
-function langInstruction(lang){
- if(lang==='Английский') return 'Язык документа: СТРОГО АНГЛИЙСКИЙ. Весь документ, включая заголовки, действия и оценивание, только на английском.';
- if(lang==='Узбекский (Кириллица)') return 'Язык документа: СТРОГО ЎЗБЕК ТИЛИ КИРИЛЛ АЛИФБОСИДА. Используй Ў, Қ, Ғ, Ҳ. Не смешивай языки.';
- if(lang==='Казахский') return 'Язык документа: СТРОГО КАЗАХСКИЙ ЯЗЫК.';
- return 'Язык документа: СТРОГО РУССКИЙ ЯЗЫК.';
+function getDocLocale(lang){
+ const isUz=lang==='Узбекский (Кириллица)';
+ const isKk=lang==='Казахский';
+ const isEn=lang==='Английский';
+ if(isUz) return {code:'uz',date:'uz-UZ',title:'Қисқа муддатли (дарс) режаси',school:'Мактаб / ташкилот:',teacher:'Педагогнинг Ф.И.О.:',subject:'Фан:',grade:'Синф / сана:',gradeOnly:'Синф:',dateOnly:'Сана:',topic:'Дарс мавзуси:',learning:'Ўқув мақсадлари:',lesson:'Дарс мақсадлари:',course:'Дарснинг бориши',order:'Қозоғистон Республикаси Таълим вазирлигининг 130-сон буйруғига мувофиқ',stage:'Дарс босқичи / вақт',teacherActions:'Педагог фаолияти',studentActions:'Ўқувчи фаолияти',assessment:'Баҳолаш',resources:'Ресурслар',visual:'Кўргазмалилик:',integrated:'Интеграция қилинган тўлиқ конспект',seminarScript:'Семинарнинг тўлиқ сценарийси',seminarProgram:'Семинар дастури',time:'Вақт',block:'Блок',content:'Мазмун',speaker:'Бошловчи матни',activity:'Фаолият',result:'Натижа',materials:'Материаллар',docFile:'KSP_130_uzbek.doc',pdfFile:'KSP_130_uzbek.pdf'};
+ if(isKk) return {code:'kk',date:'kk-KZ',title:'Қысқа мерзімді (сабақ) жоспары',school:'Мектеп / ұйым:',teacher:'Педагогтің Т.А.Ә.:',subject:'Пән:',grade:'Сынып / күн:',gradeOnly:'Сынып:',dateOnly:'Күні:',topic:'Сабақ тақырыбы:',learning:'Оқу мақсаттары:',lesson:'Сабақ мақсаттары:',course:'Сабақтың барысы',order:'Қазақстан Республикасы Оқу-ағарту министрлігінің №130 бұйрығына сәйкес',stage:'Сабақ кезеңі / уақыт',teacherActions:'Педагогтің әрекеті',studentActions:'Оқушының әрекеті',assessment:'Бағалау',resources:'Ресурстар',visual:'Көрнекілік:',integrated:'Біріктірілген толық конспект',seminarScript:'Семинардың толық сценарийі',seminarProgram:'Семинар бағдарламасы',time:'Уақыт',block:'Блок',content:'Мазмұны',speaker:'Жүргізуші мәтіні',activity:'Белсенділік',result:'Нәтиже',materials:'Материалдар',docFile:'KSP_130_kazakh.doc',pdfFile:'KSP_130_kazakh.pdf'};
+ if(isEn) return {code:'en',date:'en-GB',title:'Short-term (lesson) plan',school:'School / Organization:',teacher:'Teacher:',subject:'Subject:',grade:'Class / Date:',gradeOnly:'Class:',dateOnly:'Date:',topic:'Lesson topic:',learning:'Learning objectives:',lesson:'Lesson objectives:',course:'Lesson procedure',order:'According to Order No. 130 of the Ministry of Education of the Republic of Kazakhstan',stage:'Lesson stage / Time',teacherActions:'Teacher actions',studentActions:'Student actions',assessment:'Assessment',resources:'Resources',visual:'Visual aid:',integrated:'Integrated full lesson notes',seminarScript:'Full seminar script',seminarProgram:'Seminar program',time:'Time',block:'Block',content:'Content',speaker:'Facilitator script',activity:'Activity',result:'Result',materials:'Materials',docFile:'Lesson_Plan_Order_130_EN.doc',pdfFile:'Lesson_Plan_Order_130_EN.pdf'};
+ return {code:'ru',date:'ru-RU',title:'Краткосрочный (поурочный) план урока',school:'Школа / Организация:',teacher:'Ф.И.О. педагога:',subject:'Предмет:',grade:'Класс / Дата:',gradeOnly:'Класс:',dateOnly:'Дата:',topic:'Тема урока:',learning:'Цели обучения:',lesson:'Цели урока:',course:'Ход урока',order:'согласно Приказу №130 МОН РК',stage:'Этап урока / Время',teacherActions:'Действия педагога',studentActions:'Действия ученика',assessment:'Оценивание',resources:'Ресурсы',visual:'Наглядность:',integrated:'Интегрированный полный конспект',seminarScript:'Полный сценарий семинара',seminarProgram:'Программа семинара',time:'Время',block:'Блок',content:'Содержание',speaker:'Текст ведущего',activity:'Активность',result:'Результат',materials:'Материалы',docFile:'КСП_Урока_Приказ_130.doc',pdfFile:'КСП_Урока_Приказ_130.pdf'};
 }
-function buildPrompt({lang,detail,subject,grade,school,teacher,objective,type,inclusion,descriptors,visuals,topic}){
- return `Ты опытный педагог-методист Казахстана. Составь краткосрочный план урока (КСП) по структуре Приказа №130 МОН РК.
+function langInstruction(lang){
+ if(lang==='Английский') return 'Язык документа: СТРОГО АНГЛИЙСКИЙ. ВЕСЬ ВЫХОДНОЙ ДОКУМЕНТ должен быть только на английском языке: название документа, школа/организация, ФИО педагога, предмет, класс, дата, тема, цели, этапы, действия педагога и учащихся, оценивание, ресурсы, подписи таблиц, семинарские материалы и все дополнительные разделы. Не оставляй русские, казахские или узбекские заголовки.';
+ if(lang==='Узбекский (Кириллица)') return 'Язык документа: СТРОГО ЎЗБЕК ТИЛИ, КИРИЛЛ АЛИФБОСИДА. БУТУН ЧИҚАРИЛАДИГАН ҲУЖЖАТ ФАҚАТ ЎЗБЕК ТИЛИДА БЎЛСИН: ҳужжат номи, мактаб/ташкилот, педагог Ф.И.О., фан, синф, сана, дарс мавзуси, ўқув мақсадлари, дарс мақсадлари, барча босқичлар, педагог ва ўқувчи фаолияти, баҳолаш, ресурслар, жадвал сарлавҳалари, семинар материаллари ва қўшимча бўлимлар. Русча, қозоқча ёки инглизча сарлавҳаларни қолдирма. Ў, Қ, Ғ, Ҳ ҳарфларидан тўғри фойдалан. Агар киритилган мактаб номи ёки фан/мавзу умумий маъноли русча ёзилган бўлса, уни ўзбекчага таржима қил; расмий брендлар, исм-фамилиялар, рақамлар ва уникал номларни ўзгаришсиз сақла.';
+ if(lang==='Казахский') return 'Язык документа: СТРОГО КАЗАХСКИЙ. Весь документ, включая название, школу/организацию, ФИО педагога, предмет, класс, дату, тему, цели, этапы, действия, оценивание, ресурсы и таблицы, только на казахском языке. Не оставляй русские или английские подписи.';
+ return 'Язык документа: СТРОГО РУССКИЙ. Весь документ, включая заголовки, действия и оценивание, только на русском.';
+}
+function buildPrompt({lang,detail,subject,grade,school,teacher,objective,type,inclusion,descriptors,visuals,topic,notes}){
+ const modeInstruction={
+  'Подробный':'Сделай расширенный КСП: подробно распиши речь и действия педагога, действия учащихся, вопросы, инструкции к заданиям, ожидаемые ответы, формативное оценивание и ресурсы.',
+  'Краткий':'Сделай компактный КСП: оставь только существенные этапы, задания, действия, оценивание и ресурсы без лишней воды.',
+  'Интеграция конспекта':`Сделай КСП с ПОЛНОЙ ИНТЕГРАЦИЕЙ ПРЕДОСТАВЛЕННОГО КОНСПЕКТА. Не выбрасывай важные идеи и термины. Переработай материал в педагогически последовательный конспект, распределив его по этапам урока. Добавь объяснение учителя, вопросы, задания, ожидаемые ответы, переходы между частями, оценивание и ресурсы. В отдельном поле integrated_conspect дай связный полный конспект урока на основе исходного материала. Исходный материал:
+${notes||'[Конспект не вставлен — создай полный конспект самостоятельно по теме.]'}`,
+  'Семинар — полностью':'Сделай ПОЛНЫЙ СЦЕНАРИЙ СЕМИНАРА, а не краткий план. Включи: цель и задачи семинара, целевую аудиторию, продолжительность, подробную программу по времени, вступительное слово ведущего, теоретические блоки, тезисы выступления, вопросы аудитории, практические упражнения, кейсы, групповую работу, обсуждение, ожидаемые ответы/результаты, материалы ведущего, раздаточные материалы, рекомендации, контроль понимания, рефлексию и заключительное слово. В поле seminar_program создай подробную последовательность блоков. В поле seminar_script дай готовый сценарий с текстом ведущего, который можно проводить почти без дополнительной подготовки. Поле stages также заполни подробно, используя этапы семинара вместо обычных этапов урока.'
+ }[detail]||'';
+ return `Ты опытный педагог-методист Казахстана. Составь профессиональный документ на основе запроса пользователя.
 ${langInstruction(lang)}
-Степень детализации: ${detail}. Предмет: ${subject}. Класс: ${grade}. Формат: ${type}.
+КРИТИЧЕСКОЕ ПРАВИЛО ЛОКАЛИЗАЦИИ: ответ будет непосредственно помещён в готовый файл Word/PDF. Поэтому НИ ОДНОГО русскоязычного, казахского или английского служебного слова не должно остаться внутри содержимого, если выбран узбекский язык. Переводи не только текст урока, но и все названия полей и разделов. Значения school, teacher, subject, grade и topic тоже должны соответствовать выбранному языку; собственные имена, официальные названия, бренды и номера можно сохранять.
+Режим: ${detail}. Предмет: ${subject}. Класс/аудитория: ${grade}. Формат: ${type}.
+${modeInstruction}
 ${objective?`Обязательно используй цель обучения: "${objective}".`:''}
 ${inclusion?'Добавь адаптивные задания для учащихся с ООП.':''}
 ${descriptors?'Добавь чёткие дескрипторы формативного оценивания.':''}
-${visuals?'Для каждого этапа добавь полезную наглядность: visual_description и короткие visual_keywords на английском.':''}
+${visuals?'Для каждого этапа добавь полезную наглядность: visual_description и короткие visual_keywords на английском. visual_keywords являются техническим полем и НЕ попадут как текстовый заголовок в готовый файл.':''}
 Тема: ${topic}
 
-Верни ТОЛЬКО валидный JSON, без markdown и комментариев:
+Верни ТОЛЬКО валидный JSON, без markdown и комментариев. Все пользовательские и генерируемые текстовые значения должны быть на выбранном языке. Если school/subject/topic введены по-русски, а выбран узбекский, переведи их в узбекский; не оставляй русские подписи.
 {
 "school":"${esc(school)}","teacher":"${esc(teacher)}","subject":"${esc(subject)}","grade":"${esc(grade)}",
-"date":"${new Date().toLocaleDateString('ru-RU')}","topic":"${esc(topic)}",
+"date":"${new Date().toLocaleDateString(getDocLocale(lang).date)}","topic":"${esc(topic)}",
 "learning_objectives":["..."],"lesson_objectives":["Для всех: ...","Для большинства: ...","Для некоторых: ..."],
+"integrated_conspect":"Полный интегрированный конспект или пустая строка",
+"seminar_program":[{"time":"...","block":"...","content":"...","speaker_text":"...","activity":"...","result":"...","materials":"..."}],
+"seminar_script":"Полный сценарий семинара или пустая строка",
 "stages":[
-{"stage_name":"Начало урока (0-10 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
-{"stage_name":"Середина урока (10-35 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
-{"stage_name":"Конец урока (35-45 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."}
+{"stage_name":"...","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
+{"stage_name":"...","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
+{"stage_name":"...","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."}
 ]}`;
 }
 async function generateLessonPlan(e){
  e.preventDefault();
- const apiKey=$('apiKey').value.trim(); if(!apiKey){alert('Введите API Key.');return}
- const topic=$('lessonTopic').value.trim(); if(!topic)return;
- localStorage.setItem('eduksp_api_key',apiKey);localStorage.setItem('eduksp_provider',$('aiProvider').value);
- const cfg={lang:$('lessonLanguage').value,detail:$('detailLevel').value,subject:$('subjectName').value.trim()||'Предмет',grade:$('gradeLevel').value.trim()||'Класс',school:$('schoolName').value.trim()||'_________________',teacher:$('teacherName').value.trim()||'_________________',objective:$('customObjective').value.trim(),type:$('lessonType').value,inclusion:$('includeInclusion').checked,descriptors:$('includeDescriptors').checked,visuals:$('includeVisuals').checked,topic};
+ const apiKey=$('apiKey').value.trim();
+ if(!apiKey){alert('Введите API Key.');return}
+ const topic=$('lessonTopic').value.trim();
+ if(!topic){alert('Введите тему.');return}
+ localStorage.setItem('eduksp_api_key',apiKey);
+ localStorage.setItem('eduksp_provider',$('aiProvider').value);
+ const cfg={
+  lang:$('lessonLanguage').value,
+  detail:$('detailLevel').value,
+  notes:$('lessonNotes').value.trim(),
+  subject:$('subjectName').value.trim()||'Предмет',
+  grade:$('gradeLevel').value.trim()||'Класс / аудитория',
+  school:$('schoolName').value.trim()||'_________________',
+  teacher:$('teacherName').value.trim()||'_________________',
+  objective:$('customObjective').value.trim(),
+  type:$('lessonType').value,
+  inclusion:$('includeInclusion').checked,
+  descriptors:$('includeDescriptors').checked,
+  visuals:$('includeVisuals').checked,
+  topic
+ };
+ if(cfg.detail==='Интеграция конспекта' && !cfg.notes){
+  if(!confirm('Вы выбрали «Интеграция конспекта», но не вставили конспект. Создать полный конспект автоматически по теме?')) return;
+ }
  $('placeholderState').classList.add('hidden');$('documentContainer').classList.add('hidden');$('actionButtons').classList.add('hidden');$('loadingState').classList.remove('hidden');$('generateBtn').disabled=true;
  try{
-  const prompt=buildPrompt(cfg); const provider=$('aiProvider').value; let text='';
+  const prompt=buildPrompt(cfg);
+  const provider=$('aiProvider').value;
+  let text='';
   if(provider==='gemini'){
-   // Gemini 3.x: сначала используем актуальную GA-модель, затем безопасный fallback.
    const geminiModels=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
    let lastError=null;
    for(const model of geminiModels){
     try{
      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,{
       method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt+'\n\nВерни JSON.'}]}],generationConfig:{responseMimeType:'application/json'}})
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{responseMimeType:'application/json'}})
      });
      const data=await res.json();
-     if(res.ok&&!data.error){text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';if(text)break;}
-     lastError=new Error(data.error?.message||`Gemini ${model} HTTP ${res.status}`);
+     if(res.ok&&!data.error){
+      text=data.candidates?.[0]?.content?.parts?.map(p=>p.text||'').join('')||'';
+      if(text)break;
+     }
+     lastError=new Error(data.error?.message||`Gemini ${model}: HTTP ${res.status}`);
     }catch(error){lastError=error;}
    }
    if(!text) throw lastError||new Error('Gemini не вернул ответ.');
   }else if(provider==='deepseek'){
-   const res=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})});
-   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`DeepSeek HTTP ${res.status}`);text=data.choices?.[0]?.message?.content||'';
+   const res=await fetch('https://api.deepseek.com/chat/completions',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+    body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})
+   });
+   const data=await res.json();
+   if(!res.ok||data.error)throw new Error(data.error?.message||`DeepSeek HTTP ${res.status}`);
+   text=data.choices?.[0]?.message?.content||'';
   }else{
-   const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})});
-   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`OpenAI HTTP ${res.status}`);text=data.choices?.[0]?.message?.content||'';
+   // OpenAI: актуальная модель GPT-5.6 Luna + Responses API.
+   const res=await fetch('https://api.openai.com/v1/responses',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},
+    body:JSON.stringify({model:'gpt-5.6-luna',instructions:prompt,input:topic,store:false,text:{format:{type:'json_object'}}})
+   });
+   const data=await res.json();
+   if(!res.ok||data.error)throw new Error(data.error?.message||`OpenAI HTTP ${res.status}`);
+   text=data.output_text||data.output?.flatMap(item=>item.content||[]).filter(x=>x.type==='output_text').map(x=>x.text||'').join('')||'';
+   if(!text) throw new Error('OpenAI не вернул текстовый JSON-ответ.');
   }
-  const clean=text.replace(/```json|```/g,'').trim();const data=JSON.parse(clean);renderDocument(data,cfg.visuals);saveToHistory(data);
- }catch(err){console.error(err);alert('Не удалось создать КСП:\\n'+(err.message||err));$('loadingState').classList.add('hidden');$('placeholderState').classList.remove('hidden')}
- finally{$('generateBtn').disabled=false}
+  const clean=text.replace(/^```json\s*/i,'').replace(/```$/,'').trim();
+  const data=JSON.parse(clean);
+  renderDocument(data,cfg.visuals,cfg.lang);
+  saveToHistory(data,cfg);
+ }catch(err){
+  console.error(err);
+  alert('Не удалось создать документ:\n'+(err.message||err));
+  $('loadingState').classList.add('hidden');$('placeholderState').classList.remove('hidden');
+ }finally{
+  $('generateBtn').disabled=false;
+ }
 }
-function renderDocument(data,showVisuals=true){
+function renderDocument(data,showVisuals=true,lang){
+ const L=getDocLocale(lang||data.__lang||'Русский');
  const learning=Array.isArray(data.learning_objectives)?data.learning_objectives:[data.learning_objectives];
  const lesson=Array.isArray(data.lesson_objectives)?data.lesson_objectives:[data.lesson_objectives];
  const rows=(data.stages||[]).map(s=>{
-  const visual=showVisuals?`<div style="margin-top:6px;font-size:9.5pt;color:#333;background:#f9fafb;padding:6px;border-radius:4px;border:1px dashed #cbd5e1"><strong>Наглядность:</strong> ${esc(s.visual_description||'Схема / рисунок к теме')}<br><img src="${esc(getVisualImageUrl(s.visual_keywords||data.topic))}" alt="Иллюстрация" loading="lazy" crossorigin="anonymous" style="max-height:160px;object-fit:cover;width:100%"></div>`:'';
+  const visual=showVisuals?`<div style="margin-top:6px;font-size:9.5pt;color:#333;background:#f9fafb;padding:6px;border-radius:4px;border:1px dashed #cbd5e1"><strong>${esc(L.visual)}</strong> ${esc(s.visual_description||'')}<br><img src="${esc(getVisualImageUrl(s.visual_keywords||data.topic))}" alt="${esc(L.visual)}" loading="lazy" crossorigin="anonymous" style="max-height:160px;object-fit:cover;width:100%"></div>`:'';
   return `<tr><td><strong>${esc(s.stage_name)}</strong></td><td>${esc(s.teacher_actions)}${visual}</td><td>${esc(s.student_actions)}</td><td>${esc(s.assessment)}</td><td>${esc(s.resources)}</td></tr>`
  }).join('');
- $('documentPreview').innerHTML=`<div class="kspt-header-title" style="text-align:center;font-weight:bold;font-size:13pt;margin-bottom:15px;text-transform:uppercase">Краткосрочный (поурочный) план урока</div>
- <table><tr><td width="30%"><strong>Школа / Организация:</strong></td><td>${esc(data.school)}</td></tr><tr><td><strong>Ф.И.О. педагога:</strong></td><td>${esc(data.teacher)}</td></tr><tr><td><strong>Предмет:</strong></td><td>${esc(data.subject)}</td></tr><tr><td><strong>Класс / Дата:</strong></td><td>Класс: ${esc(data.grade)} | Дата: ${esc(data.date)}</td></tr><tr><td><strong>Тема урока:</strong></td><td><strong>${esc(data.topic)}</strong></td></tr><tr><td><strong>Цели обучения:</strong></td><td><ul style="padding-left:18px;margin:0">${learning.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr><tr><td><strong>Цели урока:</strong></td><td><ul style="padding-left:18px;margin:0">${lesson.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr></table>
- <div style="font-weight:bold;margin:15px 0 5px;text-align:center">Ход урока (согласно Приказу №130 МОН РК)</div><table><thead><tr><th width="15%">Этап урока / Время</th><th width="35%">Действия педагога + Наглядность</th><th width="23%">Действия ученика</th><th width="14%">Оценивание</th><th width="13%">Ресурсы</th></tr></thead><tbody>${rows}</tbody></table>`;
+ const integrated=data.integrated_conspect||'';
+ const seminarProgram=Array.isArray(data.seminar_program)?data.seminar_program:[];
+ const extras=`${integrated?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.integrated)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(integrated)}</div></div>`:''}${data.seminar_script?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.seminarScript)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(data.seminar_script)}</div></div>`:''}${seminarProgram.length?`<div style="margin:12px 0"><strong>${esc(L.seminarProgram)}</strong><table><thead><tr><th>${esc(L.time)}</th><th>${esc(L.block)}</th><th>${esc(L.content)}</th><th>${esc(L.speaker)}</th><th>${esc(L.activity)}</th><th>${esc(L.result)}</th><th>${esc(L.materials)}</th></tr></thead><tbody>${seminarProgram.map(x=>`<tr><td>${esc(x.time)}</td><td>${esc(x.block)}</td><td>${esc(x.content)}</td><td>${esc(x.speaker_text)}</td><td>${esc(x.activity)}</td><td>${esc(x.result)}</td><td>${esc(x.materials)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+ const safeDate=data.date||new Date().toLocaleDateString(L.date);
+ $('documentPreview').dataset.lang=L.code;
+ $('documentPreview').dataset.wordName=L.docFile;
+ $('documentPreview').dataset.pdfName=L.pdfFile;
+ $('documentPreview').innerHTML=`${extras}<div class="kspt-header-title" style="text-align:center;font-weight:bold;font-size:13pt;margin-bottom:15px;text-transform:uppercase">${esc(L.title)}</div>
+ <table><tr><td width="30%"><strong>${esc(L.school)}</strong></td><td>${esc(data.school)}</td></tr><tr><td><strong>${esc(L.teacher)}</strong></td><td>${esc(data.teacher)}</td></tr><tr><td><strong>${esc(L.subject)}</strong></td><td>${esc(data.subject)}</td></tr><tr><td><strong>${esc(L.grade)}</strong></td><td>${esc(L.gradeOnly)} ${esc(data.grade)} | ${esc(L.dateOnly)} ${esc(safeDate)}</td></tr><tr><td><strong>${esc(L.topic)}</strong></td><td><strong>${esc(data.topic)}</strong></td></tr><tr><td><strong>${esc(L.learning)}</strong></td><td><ul style="padding-left:18px;margin:0">${learning.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr><tr><td><strong>${esc(L.lesson)}</strong></td><td><ul style="padding-left:18px;margin:0">${lesson.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr></table>
+ <div style="font-weight:bold;margin:15px 0 5px;text-align:center">${esc(L.course)} (${esc(L.order)})</div><table><thead><tr><th width="15%">${esc(L.stage)}</th><th width="35%">${esc(L.teacherActions)}</th><th width="23%">${esc(L.studentActions)}</th><th width="14%">${esc(L.assessment)}</th><th width="13%">${esc(L.resources)}</th></tr></thead><tbody>${rows}</tbody></table>`;
  $('loadingState').classList.add('hidden');$('documentContainer').classList.remove('hidden');$('actionButtons').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});
 }
-function saveToHistory(item){historyData.unshift({id:Date.now(),title:item.topic,subject:item.subject,date:item.date,data:item});historyData=historyData.slice(0,10);localStorage.setItem('eduksp_history',JSON.stringify(historyData));updateHistoryBadge()}
+function saveToHistory(item,cfg){historyData.unshift({id:Date.now(),title:item.topic,subject:item.subject,date:item.date,lang:cfg?.lang||'Русский',data:item});historyData=historyData.slice(0,10);localStorage.setItem('eduksp_history',JSON.stringify(historyData));updateHistoryBadge()}
 function updateHistoryBadge(){$('historyCount').textContent=historyData.length}
 function toggleHistoryModal(){const m=$('historyModal');m.classList.toggle('hidden');m.classList.toggle('flex');if(!m.classList.contains('hidden'))renderHistoryList()}
 function renderHistoryList(){const l=$('historyList');if(!historyData.length){l.innerHTML='<p class="text-xs text-[#9a8e99] text-center py-10">История пока пуста</p>';return}l.innerHTML=historyData.map(h=>`<div class="p-3 rounded-2xl border border-[#eee1e9] bg-white/70 flex justify-between items-center gap-3"><div class="min-w-0"><p class="font-bold text-xs truncate">${esc(h.title)}</p><p class="text-[10px] text-[#958894] mt-1">${esc(h.subject)} • ${esc(h.date)}</p></div><button onclick="loadFromHistory(${Number(h.id)})" class="btn btn-primary text-[10px] py-2 px-3">Открыть</button></div>`).join('')}
-function loadFromHistory(id){const item=historyData.find(h=>h.id===id);if(item){renderDocument(item.data);toggleHistoryModal()}}
+function loadFromHistory(id){const item=historyData.find(h=>h.id===id);if(item){renderDocument(item.data,true,item.lang||item.data.__lang||'Русский');toggleHistoryModal()}}
 function clearHistory(){if(confirm('Очистить всю историю КСП?')){historyData=[];localStorage.removeItem('eduksp_history');updateHistoryBadge();renderHistoryList()}}
-function exportToWord(){const content=$('documentPreview').innerHTML;const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'Times New Roman';font-size:11pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:5px;vertical-align:top}img{max-width:100%;height:auto}</style></head><body>${content}</body></html>`;const blob=new Blob(['\ufeff',html],{type:'application/msword'});downloadBlob(blob,'КСП_Урока_Приказ_130.doc')}
+function exportToWord(){const content=$('documentPreview').innerHTML;const name=$('documentPreview').dataset.wordName||'КСП_Урока_Приказ_130.doc';const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'Times New Roman';font-size:11pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:5px;vertical-align:top}img{max-width:100%;height:auto}</style></head><body>${content}</body></html>`;const blob=new Blob(['\ufeff',html],{type:'application/msword'});downloadBlob(blob,name)}
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-async function exportToPDF(){if(typeof html2pdf==='undefined'){alert('Модуль PDF не загрузился. Проверьте интернет-соединение.');return}await html2pdf().set({margin:8,filename:'КСП_Урока_Приказ_130.pdf',image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,allowTaint:false},pagebreak:{mode:['css','legacy']},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from($('documentPreview')).save()}
+async function exportToPDF(){if(typeof html2pdf==='undefined'){alert('Модуль PDF не загрузился. Проверьте интернет-соединение.');return}const name=$('documentPreview').dataset.pdfName||'КСП_Урока_Приказ_130.pdf';await html2pdf().set({margin:8,filename:name,image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,allowTaint:false},pagebreak:{mode:['css','legacy']},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from($('documentPreview')).save()}
 </script>
 </body>
 </html>
