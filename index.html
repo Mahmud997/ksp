@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6eef8">
+<meta name="description" content="Нежный и удобный генератор краткосрочных планов урока по Приказу №130 РК.">
+<title>EduKSP — Генератор КСП</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+:root{
+ --ink:#332c3b;--muted:#786f7d;--rose:#c889aa;--rose2:#ead3df;--lav:#a79bc9;
+ --cream:#fffafc;--card:rgba(255,255,255,.88);--line:#eadfe8;--shadow:0 18px 55px rgba(92,67,91,.11);
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;background:
+ radial-gradient(circle at 8% 4%,#f7e8f1 0,transparent 28%),
+ radial-gradient(circle at 92% 12%,#eee9fa 0,transparent 30%),
+ linear-gradient(135deg,#fffafc 0%,#f8f5fb 52%,#fff9f5 100%);min-height:100vh}
+.glass{background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow);backdrop-filter:blur(16px)}
+.brand{font-family:"Playfair Display",serif}
+.pill{border:1px solid var(--line);background:#fff7fb;color:#705a6b}
+.input{width:100%;border:1px solid #e5dce5;background:#fffdfd;border-radius:14px;padding:.72rem .85rem;font-size:.82rem;outline:none;transition:.2s}
+.input:focus{border-color:#c89bb7;box-shadow:0 0 0 4px rgba(200,137,170,.12)}
+.btn{border:0;border-radius:14px;padding:.78rem 1rem;font-weight:700;transition:.2s;cursor:pointer}
+.btn-primary{color:#fff;background:linear-gradient(135deg,#bf7fa3,#9b8ac2);box-shadow:0 10px 25px rgba(173,121,163,.25)}
+.btn-primary:hover{transform:translateY(-1px);filter:saturate(1.05)}
+.btn-soft{background:#fff4f8;color:#78566a;border:1px solid #efdce7}
+.btn-soft:hover{background:#f9eaf1}
+.type-btn.active{background:#f2e3ec;border-color:#d5afc3;color:#704d62}
+.ornament{height:1px;background:linear-gradient(90deg,transparent,#e4c8d8,transparent)}
+.kspt-document{font-family:"Times New Roman",Times,serif;color:#000;background:#fff;line-height:1.35;font-size:11pt}
+.kspt-document table{width:100%;border-collapse:collapse;margin:8px 0}
+.kspt-document th,.kspt-document td{border:1px solid #000;padding:6px 8px;vertical-align:top;text-align:left;word-wrap:break-word}
+.kspt-document th{background:#f3f3f3;font-weight:bold;text-align:center}
+.kspt-document img{max-width:100%;height:auto;border-radius:4px;margin-top:6px;border:1px solid #cbd5e1;display:block}
+@media print{body *{visibility:hidden!important}.print-area,.print-area *{visibility:visible!important}.print-area{position:absolute;left:0;top:0;width:100%;box-shadow:none!important;border:0!important;background:white!important}.no-print{display:none!important}}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:#d9c5d5;border-radius:10px}
+</style>
+</head>
+<body class="pb-10">
+<header class="no-print sticky top-0 z-40 px-3 sm:px-6 pt-3">
+ <div class="glass max-w-7xl mx-auto rounded-[24px] px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+  <div class="flex items-center gap-3 min-w-0">
+   <div class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#f0d5e2] to-[#e7e0f4] text-[#79566c] shadow-sm"><i class="fa-solid fa-feather-pointed"></i></div>
+   <div class="min-w-0">
+    <div class="flex items-center gap-2 flex-wrap"><h1 class="brand text-xl sm:text-2xl">EduKSP</h1><span class="pill text-[10px] px-2 py-1 rounded-full font-bold">PRO</span></div>
+    <p class="text-[11px] sm:text-xs text-[#8a7d89] truncate">Генератор красивых КСП • Приказ №130 РК</p>
+   </div>
+  </div>
+  <button onclick="toggleHistoryModal()" class="btn btn-soft text-xs flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i><span class="hidden sm:inline">История</span><b id="historyCount">0</b></button>
+ </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-3 sm:px-6 mt-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+<section class="lg:col-span-5 space-y-4 no-print">
+ <div class="glass rounded-[24px] p-5">
+  <div class="flex items-start justify-between gap-3 mb-4">
+   <div><p class="text-[10px] uppercase tracking-[.18em] text-[#a18196] font-extrabold">AI Studio</p><h2 class="font-extrabold mt-1">Модель и доступ</h2></div>
+   <span class="w-9 h-9 rounded-xl bg-[#f8edf3] flex items-center justify-center text-[#b07194]"><i class="fa-solid fa-sparkles"></i></span>
+  </div>
+  <label class="text-[11px] font-bold text-[#766a76]">Провайдер</label>
+  <select id="aiProvider" class="input mt-1 mb-3"><option value="gemini">Google Gemini</option><option value="deepseek">DeepSeek</option><option value="openai">OpenAI</option></select>
+  <label class="text-[11px] font-bold text-[#766a76]">API Key</label>
+  <div class="relative mt-1"><input id="apiKey" type="password" autocomplete="off" placeholder="Вставьте ключ…" class="input pr-11"><button type="button" onclick="toggleKeyVisibility()" class="absolute right-3 top-3 text-[#9b8c99]"><i id="eyeIcon" class="fa-solid fa-eye"></i></button></div>
+  <p class="text-[10px] text-[#958894] mt-2"><i class="fa-solid fa-shield-halved mr-1"></i>Ключ хранится только в localStorage этого браузера.</p>
+ </div>
+
+ <div class="glass rounded-[24px] p-5">
+  <div class="flex items-center gap-2 mb-4"><span class="w-8 h-8 rounded-xl bg-[#f1eafa] flex items-center justify-center text-[#8d80b1]"><i class="fa-solid fa-sliders"></i></span><h2 class="font-extrabold">Параметры урока</h2></div>
+  <form id="ksptForm" onsubmit="generateLessonPlan(event)" class="space-y-3">
+   <div><label class="label text-[11px] font-bold">Язык урока</label><select id="lessonLanguage" class="input mt-1"><option value="Русский">Русский язык</option><option value="Казахский">Қазақ тілі</option><option value="Английский">English</option><option value="Узбекский (Кириллица)">Ўзбек тили (Кириллица)</option></select></div>
+   <div class="grid grid-cols-2 gap-2"><div><label class="text-[11px] font-bold">Предмет</label><input id="subjectName" value="Английский язык" class="input mt-1"></div><div><label class="text-[11px] font-bold">Класс</label><input id="gradeLevel" value="7 класс" class="input mt-1"></div></div>
+   <div><label class="text-[11px] font-bold">Цель обучения</label><input id="customObjective" placeholder="Например: 7.C2…" class="input mt-1"></div>
+   <div><label class="text-[11px] font-bold">Степень детализации</label><select id="detailLevel" class="input mt-1"><option value="Подробный">Подробный</option><option value="Краткий">Краткий</option></select></div>
+   <div><label class="text-[11px] font-bold">Формат урока</label><div id="typeButtons" class="grid grid-cols-2 gap-2 mt-1">
+    <button type="button" class="type-btn active btn btn-soft text-[11px]" data-type="Стандартный урок" onclick="setLessonType(this)">Стандартный</button>
+    <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Урок-игра / Интерактивный" onclick="setLessonType(this)">Урок-игра</button>
+    <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Практический / Лабораторный" onclick="setLessonType(this)">Практический</button>
+    <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Проектная деятельность" onclick="setLessonType(this)">Проектный</button>
+   </div><input type="hidden" id="lessonType" value="Стандартный урок"></div>
+   <div><label class="text-[11px] font-bold">Тема урока *</label><textarea id="lessonTopic" required rows="3" placeholder="Например: Present Perfect vs Past Simple…" class="input mt-1 resize-y"></textarea></div>
+   <div class="rounded-2xl bg-[#fff8fb] border border-[#f0e1e9] p-3 space-y-2">
+    <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeInclusion" class="accent-[#b77e9f]"> Учет инклюзии / адаптивные задания</label>
+    <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeDescriptors" checked class="accent-[#b77e9f]"> Дескрипторы для ФО</label>
+    <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeVisuals" checked class="accent-[#b77e9f]"> Наглядные схемы и иллюстрации</label>
+   </div>
+   <div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold">ФИО учителя</label><input id="teacherName" placeholder="Иванов И.И." class="input mt-1"></div><div><label class="text-[10px] font-bold">Школа</label><input id="schoolName" placeholder="Школа №…" class="input mt-1"></div></div>
+   <button id="generateBtn" type="submit" class="btn btn-primary w-full mt-1 flex justify-center items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Создать красивый КСП</span></button>
+  </form>
+ </div>
+
+ <div id="actionButtons" class="glass rounded-[24px] p-4 hidden">
+  <div class="flex justify-between items-center mb-3"><span class="text-xs font-extrabold">Документ готов</span><button onclick="toggleLiveEdit()" id="editToggleBtn" class="btn btn-soft text-[10px] py-2"><i class="fa-solid fa-pen-to-square"></i> <span id="editText">Редактировать</span></button></div>
+  <div class="grid grid-cols-2 gap-2"><button onclick="exportToWord()" class="btn btn-soft text-xs"><i class="fa-solid fa-file-word mr-1"></i> Word</button><button onclick="exportToPDF()" class="btn btn-soft text-xs"><i class="fa-solid fa-file-pdf mr-1"></i> PDF</button></div>
+  <button onclick="window.print()" class="btn w-full mt-2 bg-[#443b48] text-white text-xs"><i class="fa-solid fa-print mr-1"></i> Печать</button>
+ </div>
+</section>
+
+<section class="lg:col-span-7">
+ <div class="glass rounded-[28px] p-3 sm:p-5 min-h-[760px] print-area">
+  <div id="placeholderState" class="text-center py-32 px-6 no-print"><div class="mx-auto w-20 h-20 rounded-[28px] bg-gradient-to-br from-[#f7e6ef] to-[#ece7f7] flex items-center justify-center text-3xl text-[#ad7899] mb-5"><i class="fa-regular fa-file-lines"></i></div><h3 class="brand text-2xl">Ваш КСП появится здесь</h3><p class="text-xs text-[#938792] max-w-sm mx-auto mt-2">Заполните тему и параметры слева — EduKSP аккуратно соберёт готовый документ.</p></div>
+  <div id="loadingState" class="hidden text-center py-32 no-print"><div class="mx-auto w-14 h-14 rounded-full border-4 border-[#e8d7e2] border-t-[#b87e9f] animate-spin"></div><p class="font-bold text-sm mt-4">Создаём план…</p><p class="text-xs text-[#948894] mt-1">ИИ формирует структуру и наглядности</p></div>
+  <div id="documentContainer" class="hidden"><div id="documentPreview" class="kspt-document" contenteditable="false"></div></div>
+ </div>
+</section>
+</main>
+
+<div id="historyModal" class="fixed inset-0 bg-[#2f2734]/40 backdrop-blur-sm hidden z-50 items-center justify-center p-3 no-print">
+ <div class="glass bg-white rounded-[26px] max-w-xl w-full p-5 max-h-[82vh] flex flex-col">
+  <div class="flex justify-between items-center pb-3 border-b border-[#eee3ea]"><div><p class="text-[10px] uppercase tracking-widest text-[#a18196] font-bold">Архив</p><h3 class="font-extrabold">Сохранённые КСП</h3></div><button onclick="toggleHistoryModal()" class="w-9 h-9 rounded-xl bg-[#f7eff4]"><i class="fa-solid fa-xmark"></i></button></div>
+  <div id="historyList" class="overflow-y-auto space-y-2 flex-1 py-3"></div>
+  <div class="flex justify-between items-center pt-3 border-t border-[#eee3ea]"><button onclick="clearHistory()" class="text-xs font-bold text-[#b35e73]">Очистить историю</button><button onclick="toggleHistoryModal()" class="btn btn-soft text-xs">Закрыть</button></div>
+ </div>
+</div>
+
+<script>
+let isEditing=false, historyData=[];
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+document.addEventListener('DOMContentLoaded',()=>{
+ const key=localStorage.getItem('eduksp_api_key'); if(key) $('apiKey').value=key;
+ const provider=localStorage.getItem('eduksp_provider'); if(provider) $('aiProvider').value=provider;
+ try{historyData=JSON.parse(localStorage.getItem('eduksp_history')||'[]')}catch{historyData=[]}
+ updateHistoryBadge();
+});
+function toggleKeyVisibility(){const i=$('apiKey');i.type=i.type==='password'?'text':'password';$('eyeIcon').className=i.type==='password'?'fa-solid fa-eye':'fa-solid fa-eye-slash'}
+function setLessonType(btn){document.querySelectorAll('.type-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$('lessonType').value=btn.dataset.type}
+function toggleLiveEdit(){isEditing=!isEditing;const d=$('documentPreview'),b=$('editToggleBtn');d.contentEditable=isEditing?'true':'false';$('editText').textContent=isEditing?'Сохранить правки':'Редактировать';b.classList.toggle('bg-[#ead9e3]',isEditing)}
+function getVisualImageUrl(keywords){const prompt=encodeURIComponent((keywords||'educational illustration diagram')+' educational diagram clean pastel vector, no text');return `https://image.pollinations.ai/prompt/${prompt}?width=800&height=440&nologo=true`}
+function langInstruction(lang){
+ if(lang==='Английский') return 'Язык документа: СТРОГО АНГЛИЙСКИЙ. Весь документ, включая заголовки, действия и оценивание, только на английском.';
+ if(lang==='Узбекский (Кириллица)') return 'Язык документа: СТРОГО ЎЗБЕК ТИЛИ КИРИЛЛ АЛИФБОСИДА. Используй Ў, Қ, Ғ, Ҳ. Не смешивай языки.';
+ if(lang==='Казахский') return 'Язык документа: СТРОГО КАЗАХСКИЙ ЯЗЫК.';
+ return 'Язык документа: СТРОГО РУССКИЙ ЯЗЫК.';
+}
+function buildPrompt({lang,detail,subject,grade,school,teacher,objective,type,inclusion,descriptors,visuals,topic}){
+ return `Ты опытный педагог-методист Казахстана. Составь краткосрочный план урока (КСП) по структуре Приказа №130 МОН РК.
+${langInstruction(lang)}
+Степень детализации: ${detail}. Предмет: ${subject}. Класс: ${grade}. Формат: ${type}.
+${objective?`Обязательно используй цель обучения: "${objective}".`:''}
+${inclusion?'Добавь адаптивные задания для учащихся с ООП.':''}
+${descriptors?'Добавь чёткие дескрипторы формативного оценивания.':''}
+${visuals?'Для каждого этапа добавь полезную наглядность: visual_description и короткие visual_keywords на английском.':''}
+Тема: ${topic}
+
+Верни ТОЛЬКО валидный JSON, без markdown и комментариев:
+{
+"school":"${esc(school)}","teacher":"${esc(teacher)}","subject":"${esc(subject)}","grade":"${esc(grade)}",
+"date":"${new Date().toLocaleDateString('ru-RU')}","topic":"${esc(topic)}",
+"learning_objectives":["..."],"lesson_objectives":["Для всех: ...","Для большинства: ...","Для некоторых: ..."],
+"stages":[
+{"stage_name":"Начало урока (0-10 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
+{"stage_name":"Середина урока (10-35 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."},
+{"stage_name":"Конец урока (35-45 мин)","teacher_actions":"...","student_actions":"...","assessment":"...","resources":"...","visual_description":"...","visual_keywords":"..."}
+]}`;
+}
+async function generateLessonPlan(e){
+ e.preventDefault();
+ const apiKey=$('apiKey').value.trim(); if(!apiKey){alert('Введите API Key.');return}
+ const topic=$('lessonTopic').value.trim(); if(!topic)return;
+ localStorage.setItem('eduksp_api_key',apiKey);localStorage.setItem('eduksp_provider',$('aiProvider').value);
+ const cfg={lang:$('lessonLanguage').value,detail:$('detailLevel').value,subject:$('subjectName').value.trim()||'Предмет',grade:$('gradeLevel').value.trim()||'Класс',school:$('schoolName').value.trim()||'_________________',teacher:$('teacherName').value.trim()||'_________________',objective:$('customObjective').value.trim(),type:$('lessonType').value,inclusion:$('includeInclusion').checked,descriptors:$('includeDescriptors').checked,visuals:$('includeVisuals').checked,topic};
+ $('placeholderState').classList.add('hidden');$('documentContainer').classList.add('hidden');$('actionButtons').classList.add('hidden');$('loadingState').classList.remove('hidden');$('generateBtn').disabled=true;
+ try{
+  const prompt=buildPrompt(cfg); const provider=$('aiProvider').value; let text='';
+  if(provider==='gemini'){
+   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt+'\n\nВерни JSON.'}]}],generationConfig:{responseMimeType:'application/json',temperature:.35}})});
+   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`Gemini HTTP ${res.status}`);text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  }else if(provider==='deepseek'){
+   const res=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})});
+   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`DeepSeek HTTP ${res.status}`);text=data.choices?.[0]?.message?.content||'';
+  }else{
+   const res=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})});
+   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`OpenAI HTTP ${res.status}`);text=data.choices?.[0]?.message?.content||'';
+  }
+  const clean=text.replace(/```json|```/g,'').trim();const data=JSON.parse(clean);renderDocument(data,cfg.visuals);saveToHistory(data);
+ }catch(err){console.error(err);alert('Не удалось создать КСП:\\n'+(err.message||err));$('loadingState').classList.add('hidden');$('placeholderState').classList.remove('hidden')}
+ finally{$('generateBtn').disabled=false}
+}
+function renderDocument(data,showVisuals=true){
+ const learning=Array.isArray(data.learning_objectives)?data.learning_objectives:[data.learning_objectives];
+ const lesson=Array.isArray(data.lesson_objectives)?data.lesson_objectives:[data.lesson_objectives];
+ const rows=(data.stages||[]).map(s=>{
+  const visual=showVisuals?`<div style="margin-top:6px;font-size:9.5pt;color:#333;background:#f9fafb;padding:6px;border-radius:4px;border:1px dashed #cbd5e1"><strong>Наглядность:</strong> ${esc(s.visual_description||'Схема / рисунок к теме')}<br><img src="${esc(getVisualImageUrl(s.visual_keywords||data.topic))}" alt="Иллюстрация" loading="lazy" crossorigin="anonymous" style="max-height:160px;object-fit:cover;width:100%"></div>`:'';
+  return `<tr><td><strong>${esc(s.stage_name)}</strong></td><td>${esc(s.teacher_actions)}${visual}</td><td>${esc(s.student_actions)}</td><td>${esc(s.assessment)}</td><td>${esc(s.resources)}</td></tr>`
+ }).join('');
+ $('documentPreview').innerHTML=`<div class="kspt-header-title" style="text-align:center;font-weight:bold;font-size:13pt;margin-bottom:15px;text-transform:uppercase">Краткосрочный (поурочный) план урока</div>
+ <table><tr><td width="30%"><strong>Школа / Организация:</strong></td><td>${esc(data.school)}</td></tr><tr><td><strong>Ф.И.О. педагога:</strong></td><td>${esc(data.teacher)}</td></tr><tr><td><strong>Предмет:</strong></td><td>${esc(data.subject)}</td></tr><tr><td><strong>Класс / Дата:</strong></td><td>Класс: ${esc(data.grade)} | Дата: ${esc(data.date)}</td></tr><tr><td><strong>Тема урока:</strong></td><td><strong>${esc(data.topic)}</strong></td></tr><tr><td><strong>Цели обучения:</strong></td><td><ul style="padding-left:18px;margin:0">${learning.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr><tr><td><strong>Цели урока:</strong></td><td><ul style="padding-left:18px;margin:0">${lesson.filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></td></tr></table>
+ <div style="font-weight:bold;margin:15px 0 5px;text-align:center">Ход урока (согласно Приказу №130 МОН РК)</div><table><thead><tr><th width="15%">Этап урока / Время</th><th width="35%">Действия педагога + Наглядность</th><th width="23%">Действия ученика</th><th width="14%">Оценивание</th><th width="13%">Ресурсы</th></tr></thead><tbody>${rows}</tbody></table>`;
+ $('loadingState').classList.add('hidden');$('documentContainer').classList.remove('hidden');$('actionButtons').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});
+}
+function saveToHistory(item){historyData.unshift({id:Date.now(),title:item.topic,subject:item.subject,date:item.date,data:item});historyData=historyData.slice(0,10);localStorage.setItem('eduksp_history',JSON.stringify(historyData));updateHistoryBadge()}
+function updateHistoryBadge(){$('historyCount').textContent=historyData.length}
+function toggleHistoryModal(){const m=$('historyModal');m.classList.toggle('hidden');m.classList.toggle('flex');if(!m.classList.contains('hidden'))renderHistoryList()}
+function renderHistoryList(){const l=$('historyList');if(!historyData.length){l.innerHTML='<p class="text-xs text-[#9a8e99] text-center py-10">История пока пуста</p>';return}l.innerHTML=historyData.map(h=>`<div class="p-3 rounded-2xl border border-[#eee1e9] bg-white/70 flex justify-between items-center gap-3"><div class="min-w-0"><p class="font-bold text-xs truncate">${esc(h.title)}</p><p class="text-[10px] text-[#958894] mt-1">${esc(h.subject)} • ${esc(h.date)}</p></div><button onclick="loadFromHistory(${Number(h.id)})" class="btn btn-primary text-[10px] py-2 px-3">Открыть</button></div>`).join('')}
+function loadFromHistory(id){const item=historyData.find(h=>h.id===id);if(item){renderDocument(item.data);toggleHistoryModal()}}
+function clearHistory(){if(confirm('Очистить всю историю КСП?')){historyData=[];localStorage.removeItem('eduksp_history');updateHistoryBadge();renderHistoryList()}}
+function exportToWord(){const content=$('documentPreview').innerHTML;const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:'Times New Roman';font-size:11pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #000;padding:5px;vertical-align:top}img{max-width:100%;height:auto}</style></head><body>${content}</body></html>`;const blob=new Blob(['\ufeff',html],{type:'application/msword'});downloadBlob(blob,'КСП_Урока_Приказ_130.doc')}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+async function exportToPDF(){if(typeof html2pdf==='undefined'){alert('Модуль PDF не загрузился. Проверьте интернет-соединение.');return}await html2pdf().set({margin:8,filename:'КСП_Урока_Приказ_130.pdf',image:{type:'jpeg',quality:.96},html2canvas:{scale:2,useCORS:true,allowTaint:false},pagebreak:{mode:['css','legacy']},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from($('documentPreview')).save()}
+</script>
+</body>
+</html>
