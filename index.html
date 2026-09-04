@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f6eef8">
 <meta name="description" content="Нежный и удобный генератор краткосрочных планов урока по Приказу №130 РК.">
-<title>EduKSP — Генератор КСП</title>
+<title>EduKSP PRO v2 — Генератор КСП</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -47,7 +47,7 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
   <div class="flex items-center gap-3 min-w-0">
    <div class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#f0d5e2] to-[#e7e0f4] text-[#79566c] shadow-sm"><i class="fa-solid fa-feather-pointed"></i></div>
    <div class="min-w-0">
-    <div class="flex items-center gap-2 flex-wrap"><h1 class="brand text-xl sm:text-2xl">EduKSP</h1><span class="pill text-[10px] px-2 py-1 rounded-full font-bold">PRO</span></div>
+    <div class="flex items-center gap-2 flex-wrap"><h1 class="brand text-xl sm:text-2xl">EduKSP</h1><span class="pill text-[10px] px-2 py-1 rounded-full font-bold">PRO v2</span></div>
     <p class="text-[11px] sm:text-xs text-[#8a7d89] truncate">Генератор красивых КСП • Приказ №130 РК</p>
    </div>
   </div>
@@ -168,8 +168,21 @@ async function generateLessonPlan(e){
  try{
   const prompt=buildPrompt(cfg); const provider=$('aiProvider').value; let text='';
   if(provider==='gemini'){
-   const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt+'\n\nВерни JSON.'}]}],generationConfig:{responseMimeType:'application/json',temperature:.35}})});
-   const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`Gemini HTTP ${res.status}`);text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+   // Gemini 3.x: сначала используем актуальную GA-модель, затем безопасный fallback.
+   const geminiModels=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
+   let lastError=null;
+   for(const model of geminiModels){
+    try{
+     const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt+'\n\nВерни JSON.'}]}],generationConfig:{responseMimeType:'application/json'}})
+     });
+     const data=await res.json();
+     if(res.ok&&!data.error){text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';if(text)break;}
+     lastError=new Error(data.error?.message||`Gemini ${model} HTTP ${res.status}`);
+    }catch(error){lastError=error;}
+   }
+   if(!text) throw lastError||new Error('Gemini не вернул ответ.');
   }else if(provider==='deepseek'){
    const res=await fetch('https://api.deepseek.com/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${apiKey}`},body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:prompt},{role:'user',content:topic}],temperature:.35,response_format:{type:'json_object'}})});
    const data=await res.json();if(!res.ok||data.error)throw new Error(data.error?.message||`DeepSeek HTTP ${res.status}`);text=data.choices?.[0]?.message?.content||'';
