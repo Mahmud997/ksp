@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f6eef8">
-<meta name="description" content="Генератор краткосрочных планов от Алимов М.К.">
-<title>EduKSP — от Алимов М</title>
+<meta name="description" content="Нежный и удобный генератор краткосрочных планов урока по Приказу №130 РК.">
+<title>EduKSP PRO v2 — Генератор КСП</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/js/all.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -31,6 +31,7 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
 .btn-soft{background:#fff4f8;color:#78566a;border:1px solid #efdce7}
 .btn-soft:hover{background:#f9eaf1}
 .type-btn.active{background:#f2e3ec;border-color:#d5afc3;color:#704d62}
+.ai-exercise{border:1px solid #eadfe8;background:linear-gradient(135deg,#fffafd,#f8f5ff);border-radius:18px;padding:12px;margin:12px 0}.ai-exercise h4{font-weight:800;margin:0 0 6px}.ai-task{white-space:pre-wrap;background:#fff;border:1px solid #eee4ec;border-radius:12px;padding:10px}.ai-answer{width:100%;min-height:90px;border:1px solid #e5dce5;border-radius:12px;padding:10px;margin-top:8px}.ai-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.ai-actions button,.ai-actions a{font:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .ornament{height:1px;background:linear-gradient(90deg,transparent,#e4c8d8,transparent)}
 .kspt-document{font-family:"Times New Roman",Times,serif;color:#000;background:#fff;line-height:1.35;font-size:11pt}
 .kspt-document table{width:100%;border-collapse:collapse;margin:8px 0}
@@ -47,8 +48,8 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
   <div class="flex items-center gap-3 min-w-0">
    <div class="w-11 h-11 shrink-0 rounded-2xl flex items-center justify-center bg-gradient-to-br from-[#f0d5e2] to-[#e7e0f4] text-[#79566c] shadow-sm"><i class="fa-solid fa-feather-pointed"></i></div>
    <div class="min-w-0">
-    <div class="flex items-center gap-2 flex-wrap"><h1 class="brand text-xl sm:text-2xl">EduKSP</h1><span class="pill text-[10px] px-2 py-1 rounded-full font-bold">Алимов М</span></div>
-    <p class="text-[11px] sm:text-xs text-[#8a7d89] truncate">Генератор красивых КСП </p>
+    <div class="flex items-center gap-2 flex-wrap"><h1 class="brand text-xl sm:text-2xl">EduKSP</h1><span class="pill text-[10px] px-2 py-1 rounded-full font-bold">PRO v2</span></div>
+    <p class="text-[11px] sm:text-xs text-[#8a7d89] truncate">Генератор красивых КСП • Приказ №130 РК</p>
    </div>
   </div>
   <button onclick="toggleHistoryModal()" class="btn btn-soft text-xs flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left"></i><span class="hidden sm:inline">История</span><b id="historyCount">0</b></button>
@@ -98,12 +99,18 @@ body{margin:0;color:var(--ink);font-family:Manrope,system-ui,sans-serif;backgrou
     <button type="button" class="type-btn btn btn-soft text-[11px]" data-type="Семинар / Тренинг" onclick="setLessonType(this)">Семинар / тренинг</button>
    </div><input type="hidden" id="lessonType" value="Стандартный урок"></div>
    <div><label class="text-[11px] font-bold">Тема урока *</label><textarea id="lessonTopic" required rows="3" placeholder="Например: Present Perfect vs Past Simple…" class="input mt-1 resize-y"></textarea></div>
+   <div class="rounded-2xl bg-[#faf7ff] border border-[#e8def1] p-3 space-y-2">
+    <div class="flex items-center gap-2"><span class="w-8 h-8 rounded-xl bg-[#eee8f8] flex items-center justify-center text-[#8d80b1]"><i class="fa-solid fa-robot"></i></span><div><div class="text-[11px] font-extrabold">ИИ-упражнения для учеников</div><div class="text-[10px] text-[#958894]">Задание в классе + домашнее задание + помощь ИИ, если ученик затрудняется</div></div></div>
+    <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeClassExercise" checked class="accent-[#8d80b1]"> ИИ-упражнение в классе</label>
+    <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeHomeworkExercise" checked class="accent-[#b77e9f]"> ИИ-упражнение для домашнего задания</label>
+    <p class="text-[10px] text-[#958894]">Ученик сначала выполняет задание самостоятельно. При затруднении кнопка «Помощь ИИ» открывает ChatGPT с готовым учебным запросом: ИИ должен объяснять шагами и не выдавать ответ сразу.</p>
+   </div>
    <div class="rounded-2xl bg-[#fff8fb] border border-[#f0e1e9] p-3 space-y-2">
     <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeInclusion" class="accent-[#b77e9f]"> Учет инклюзии / адаптивные задания</label>
     <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeDescriptors" checked class="accent-[#b77e9f]"> Дескрипторы для ФО</label>
     <label class="flex items-center gap-2 text-[11px] font-semibold cursor-pointer"><input type="checkbox" id="includeVisuals" checked class="accent-[#b77e9f]"> Наглядные схемы и иллюстрации</label>
    </div>
-   <div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold">ФИО учителя</label><input id="teacherName" placeholder="Алимов М.К." class="input mt-1"></div><div><label class="text-[10px] font-bold">Школа</label><input id="schoolName" placeholder="Школа №…" class="input mt-1"></div></div>
+   <div class="grid grid-cols-2 gap-2"><div><label class="text-[10px] font-bold">ФИО учителя</label><input id="teacherName" placeholder="Иванов И.И." class="input mt-1"></div><div><label class="text-[10px] font-bold">Школа</label><input id="schoolName" placeholder="Школа №…" class="input mt-1"></div></div>
    <button id="generateBtn" type="submit" class="btn btn-primary w-full mt-1 flex justify-center items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Создать красивый КСП</span></button>
   </form>
  </div>
@@ -168,10 +175,10 @@ function getDocLocale(lang){
  const isUz=lang==='Узбекский (Кириллица)';
  const isKk=lang==='Казахский';
  const isEn=lang==='Английский';
- if(isUz) return {code:'uz',date:'uz-UZ',title:'Қисқа муддатли (дарс) режаси',school:'Мактаб / ташкилот:',teacher:'Педагогнинг Ф.И.О.:',subject:'Фан:',grade:'Синф / сана:',gradeOnly:'Синф:',dateOnly:'Сана:',topic:'Дарс мавзуси:',learning:'Ўқув мақсадлари:',lesson:'Дарс мақсадлари:',course:'Дарснинг бориши',order:'Қозоғистон Республикаси Таълим вазирлигининг 130-сон буйруғига мувофиқ',stage:'Дарс босқичи / вақт',teacherActions:'Педагог фаолияти',studentActions:'Ўқувчи фаолияти',assessment:'Баҳолаш',resources:'Ресурслар',visual:'Кўргазмалилик:',integrated:'Интеграция қилинган тўлиқ конспект',seminarScript:'Семинарнинг тўлиқ сценарийси',seminarProgram:'Семинар дастури',time:'Вақт',block:'Блок',content:'Мазмун',speaker:'Бошловчи матни',activity:'Фаолият',result:'Натижа',materials:'Материаллар',docFile:'KSP_130_uzbek.doc',pdfFile:'KSP_130_uzbek.pdf'};
- if(isKk) return {code:'kk',date:'kk-KZ',title:'Қысқа мерзімді (сабақ) жоспары',school:'Мектеп / ұйым:',teacher:'Педагогтің Т.А.Ә.:',subject:'Пән:',grade:'Сынып / күн:',gradeOnly:'Сынып:',dateOnly:'Күні:',topic:'Сабақ тақырыбы:',learning:'Оқу мақсаттары:',lesson:'Сабақ мақсаттары:',course:'Сабақтың барысы',order:'Қазақстан Республикасы Оқу-ағарту министрлігінің №130 бұйрығына сәйкес',stage:'Сабақ кезеңі / уақыт',teacherActions:'Педагогтің әрекеті',studentActions:'Оқушының әрекеті',assessment:'Бағалау',resources:'Ресурстар',visual:'Көрнекілік:',integrated:'Біріктірілген толық конспект',seminarScript:'Семинардың толық сценарийі',seminarProgram:'Семинар бағдарламасы',time:'Уақыт',block:'Блок',content:'Мазмұны',speaker:'Жүргізуші мәтіні',activity:'Белсенділік',result:'Нәтиже',materials:'Материалдар',docFile:'KSP_130_kazakh.doc',pdfFile:'KSP_130_kazakh.pdf'};
- if(isEn) return {code:'en',date:'en-GB',title:'Short-term (lesson) plan',school:'School / Organization:',teacher:'Teacher:',subject:'Subject:',grade:'Class / Date:',gradeOnly:'Class:',dateOnly:'Date:',topic:'Lesson topic:',learning:'Learning objectives:',lesson:'Lesson objectives:',course:'Lesson procedure',order:'According to Order No. 130 of the Ministry of Education of the Republic of Kazakhstan',stage:'Lesson stage / Time',teacherActions:'Teacher actions',studentActions:'Student actions',assessment:'Assessment',resources:'Resources',visual:'Visual aid:',integrated:'Integrated full lesson notes',seminarScript:'Full seminar script',seminarProgram:'Seminar program',time:'Time',block:'Block',content:'Content',speaker:'Facilitator script',activity:'Activity',result:'Result',materials:'Materials',docFile:'Lesson_Plan_Order_130_EN.doc',pdfFile:'Lesson_Plan_Order_130_EN.pdf'};
- return {code:'ru',date:'ru-RU',title:'Краткосрочный (поурочный) план урока',school:'Школа / Организация:',teacher:'Ф.И.О. педагога:',subject:'Предмет:',grade:'Класс / Дата:',gradeOnly:'Класс:',dateOnly:'Дата:',topic:'Тема урока:',learning:'Цели обучения:',lesson:'Цели урока:',course:'Ход урока',order:'согласно Приказу №130 МОН РК',stage:'Этап урока / Время',teacherActions:'Действия педагога',studentActions:'Действия ученика',assessment:'Оценивание',resources:'Ресурсы',visual:'Наглядность:',integrated:'Интегрированный полный конспект',seminarScript:'Полный сценарий семинара',seminarProgram:'Программа семинара',time:'Время',block:'Блок',content:'Содержание',speaker:'Текст ведущего',activity:'Активность',result:'Результат',materials:'Материалы',docFile:'КСП_Урока_Приказ_130.doc',pdfFile:'КСП_Урока_Приказ_130.pdf'};
+ if(isUz) return {code:'uz',date:'uz-UZ',title:'Қисқа муддатли (дарс) режаси',school:'Мактаб / ташкилот:',teacher:'Педагогнинг Ф.И.О.:',subject:'Фан:',grade:'Синф / сана:',gradeOnly:'Синф:',dateOnly:'Сана:',topic:'Дарс мавзуси:',learning:'Ўқув мақсадлари:',lesson:'Дарс мақсадлари:',course:'Дарснинг бориши',order:'Қозоғистон Республикаси Таълим вазирлигининг 130-сон буйруғига мувофиқ',stage:'Дарс босқичи / вақт',teacherActions:'Педагог фаолияти',studentActions:'Ўқувчи фаолияти',assessment:'Баҳолаш',resources:'Ресурслар',visual:'Кўргазмалилик:',integrated:'Интеграция қилинган тўлиқ конспект',seminarScript:'Семинарнинг тўлиқ сценарийси',seminarProgram:'Семинар дастури',time:'Вақт',block:'Блок',content:'Мазмун',speaker:'Бошловчи матни',activity:'Фаолият',result:'Натижа',materials:'Материаллар',classExercise:'Синфдаги СИ машқи',homeExercise:'СИ уй вазифаси',instructions:'Йўриқнома',successCriteria:'Муваффақият мезонлари',hint:'Ишора',aiHelp:'СИ ёрдами',copyPrompt:'Сўровни нусхалаш',answerPlaceholder:'Топшириқни шу ерда бажаринг. Аввало ўзингиз уриниб кўринг…',docFile:'KSP_130_uzbek.doc',pdfFile:'KSP_130_uzbek.pdf'};
+ if(isKk) return {code:'kk',date:'kk-KZ',title:'Қысқа мерзімді (сабақ) жоспары',school:'Мектеп / ұйым:',teacher:'Педагогтің Т.А.Ә.:',subject:'Пән:',grade:'Сынып / күн:',gradeOnly:'Сынып:',dateOnly:'Күні:',topic:'Сабақ тақырыбы:',learning:'Оқу мақсаттары:',lesson:'Сабақ мақсаттары:',course:'Сабақтың барысы',order:'Қазақстан Республикасы Оқу-ағарту министрлігінің №130 бұйрығына сәйкес',stage:'Сабақ кезеңі / уақыт',teacherActions:'Педагогтің әрекеті',studentActions:'Оқушының әрекеті',assessment:'Бағалау',resources:'Ресурстар',visual:'Көрнекілік:',integrated:'Біріктірілген толық конспект',seminarScript:'Семинардың толық сценарийі',seminarProgram:'Семинар бағдарламасы',time:'Уақыт',block:'Блок',content:'Мазмұны',speaker:'Жүргізуші мәтіні',activity:'Белсенділік',result:'Нәтиже',materials:'Материалдар',classExercise:'Сыныптағы ЖИ жаттығуы',homeExercise:'ЖИ үй тапсырмасы',instructions:'Нұсқаулық',successCriteria:'Жетістік критерийлері',hint:'Кеңес',aiHelp:'ЖИ көмегі',copyPrompt:'Сұрауды көшіру',answerPlaceholder:'Тапсырманы осы жерде орындаңыз. Алдымен өзіңіз жасап көріңіз…',docFile:'KSP_130_kazakh.doc',pdfFile:'KSP_130_kazakh.pdf'};
+ if(isEn) return {code:'en',date:'en-GB',title:'Short-term (lesson) plan',school:'School / Organization:',teacher:'Teacher:',subject:'Subject:',grade:'Class / Date:',gradeOnly:'Class:',dateOnly:'Date:',topic:'Lesson topic:',learning:'Learning objectives:',lesson:'Lesson objectives:',course:'Lesson procedure',order:'According to Order No. 130 of the Ministry of Education of the Republic of Kazakhstan',stage:'Lesson stage / Time',teacherActions:'Teacher actions',studentActions:'Student actions',assessment:'Assessment',resources:'Resources',visual:'Visual aid:',integrated:'Integrated full lesson notes',seminarScript:'Full seminar script',seminarProgram:'Seminar program',time:'Time',block:'Block',content:'Content',speaker:'Facilitator script',activity:'Activity',result:'Result',materials:'Materials',classExercise:'AI classroom exercise',homeExercise:'AI homework',instructions:'Instructions',successCriteria:'Success criteria',hint:'Hint',aiHelp:'AI help',copyPrompt:'Copy prompt',answerPlaceholder:'Complete the task here. Try it yourself first…',docFile:'Lesson_Plan_Order_130_EN.doc',pdfFile:'Lesson_Plan_Order_130_EN.pdf'};
+ return {code:'ru',date:'ru-RU',title:'Краткосрочный (поурочный) план урока',school:'Школа / Организация:',teacher:'Ф.И.О. педагога:',subject:'Предмет:',grade:'Класс / Дата:',gradeOnly:'Класс:',dateOnly:'Дата:',topic:'Тема урока:',learning:'Цели обучения:',lesson:'Цели урока:',course:'Ход урока',order:'согласно Приказу №130 МОН РК',stage:'Этап урока / Время',teacherActions:'Действия педагога',studentActions:'Действия ученика',assessment:'Оценивание',resources:'Ресурсы',visual:'Наглядность:',integrated:'Интегрированный полный конспект',seminarScript:'Полный сценарий семинара',seminarProgram:'Программа семинара',time:'Время',block:'Блок',content:'Содержание',speaker:'Текст ведущего',activity:'Активность',result:'Результат',materials:'Материалы',classExercise:'ИИ-упражнение в классе',homeExercise:'ИИ-домашнее задание',instructions:'Инструкция',successCriteria:'Критерии успеха',hint:'Подсказка',aiHelp:'Помощь ИИ',copyPrompt:'Скопировать запрос',answerPlaceholder:'Выполните задание здесь. Сначала попробуйте самостоятельно…',docFile:'КСП_Урока_Приказ_130.doc',pdfFile:'КСП_Урока_Приказ_130.pdf'};
 }
 function langInstruction(lang){
  if(lang==='Английский') return 'Язык документа: СТРОГО АНГЛИЙСКИЙ. ВЕСЬ ВЫХОДНОЙ ДОКУМЕНТ должен быть только на английском языке: название документа, школа/организация, ФИО педагога, предмет, класс, дата, тема, цели, этапы, действия педагога и учащихся, оценивание, ресурсы, подписи таблиц, семинарские материалы и все дополнительные разделы. Не оставляй русские, казахские или узбекские заголовки.';
@@ -179,7 +186,7 @@ function langInstruction(lang){
  if(lang==='Казахский') return 'Язык документа: СТРОГО КАЗАХСКИЙ. Весь документ, включая название, школу/организацию, ФИО педагога, предмет, класс, дату, тему, цели, этапы, действия, оценивание, ресурсы и таблицы, только на казахском языке. Не оставляй русские или английские подписи.';
  return 'Язык документа: СТРОГО РУССКИЙ. Весь документ, включая заголовки, действия и оценивание, только на русском.';
 }
-function buildPrompt({lang,detail,subject,grade,school,teacher,objective,type,inclusion,descriptors,visuals,topic,notes}){
+function buildPrompt({lang,detail,subject,grade,school,teacher,objective,type,inclusion,descriptors,visuals,includeClassExercise,includeHomeworkExercise,topic,notes}){
  const modeInstruction={
   'Подробный':'Сделай расширенный КСП: подробно распиши речь и действия педагога, действия учащихся, вопросы, инструкции к заданиям, ожидаемые ответы, формативное оценивание и ресурсы.',
   'Краткий':'Сделай компактный КСП: оставь только существенные этапы, задания, действия, оценивание и ресурсы без лишней воды.',
@@ -196,6 +203,8 @@ ${objective?`Обязательно используй цель обучения
 ${inclusion?'Добавь адаптивные задания для учащихся с ООП.':''}
 ${descriptors?'Добавь чёткие дескрипторы формативного оценивания.':''}
 ${visuals?'Для каждого этапа добавь полезную наглядность: visual_description и короткие visual_keywords на английском. visual_keywords являются техническим полем и НЕ попадут как текстовый заголовок в готовый файл.':''}
+${includeClassExercise?'СОЗДАЙ ИИ-УПРАЖНЕНИЕ В КЛАССЕ. Оно должно быть выполнимым учеником самостоятельно: чёткая инструкция, 3–5 заданий разного уровня, ожидаемый результат, критерии успеха и подсказка без готового ответа. Не решай упражнение за ученика. Если опция выключена, верни class_exercise как пустой объект.':''}
+${includeHomeworkExercise?'СОЗДАЙ ИИ-УПРАЖНЕНИЕ ДЛЯ ДОМАШНЕГО ЗАДАНИЯ. Ученик должен выполнить его самостоятельно: чёткая инструкция, 3–5 пунктов, ожидаемый результат, критерии успеха и подсказка без готового ответа. Если опция выключена, верни homework_exercise как пустой объект.':''}
 Тема: ${topic}
 
 Верни ТОЛЬКО валидный JSON, без markdown и комментариев. Все пользовательские и генерируемые текстовые значения должны быть на выбранном языке. Если school/subject/topic введены по-русски, а выбран узбекский, переведи их в узбекский; не оставляй русские подписи.
@@ -203,6 +212,8 @@ ${visuals?'Для каждого этапа добавь полезную наг
 "school":"${esc(school)}","teacher":"${esc(teacher)}","subject":"${esc(subject)}","grade":"${esc(grade)}",
 "date":"${new Date().toLocaleDateString(getDocLocale(lang).date)}","topic":"${esc(topic)}",
 "learning_objectives":["..."],"lesson_objectives":["Для всех: ...","Для большинства: ...","Для некоторых: ..."],
+"class_exercise":{"title":"...","instructions":"...","tasks":["...","...","..."],"success_criteria":["...","..."],"hint":"Подсказка без готового ответа"},
+"homework_exercise":{"title":"...","instructions":"...","tasks":["...","...","..."],"success_criteria":["...","..."],"hint":"Подсказка без готового ответа"},
 "integrated_conspect":"Полный интегрированный конспект или пустая строка",
 "seminar_program":[{"time":"...","block":"...","content":"...","speaker_text":"...","activity":"...","result":"...","materials":"..."}],
 "seminar_script":"Полный сценарий семинара или пустая строка",
@@ -233,6 +244,8 @@ async function generateLessonPlan(e){
   inclusion:$('includeInclusion').checked,
   descriptors:$('includeDescriptors').checked,
   visuals:$('includeVisuals').checked,
+  includeClassExercise:$('includeClassExercise').checked,
+  includeHomeworkExercise:$('includeHomeworkExercise').checked,
   topic
  };
  if(cfg.detail==='Интеграция конспекта' && !cfg.notes){
@@ -292,7 +305,53 @@ async function generateLessonPlan(e){
   $('generateBtn').disabled=false;
  }
 }
+function aiExercisePrompt(exercise,kind,data,lang){
+ const L=getDocLocale(lang||data.__lang||'Русский');
+ const title=exercise?.title||'';
+ const instructions=exercise?.instructions||'';
+ const tasks=Array.isArray(exercise?.tasks)?exercise.tasks:[];
+ const topic=data?.topic||'';
+ const language=lang||'Русский';
+ const taskText=tasks.map((x,i)=>`${i+1}. ${x}`).join('\n');
+ return `Ты учебный ИИ-помощник. Я ученик. Я выполняю ${kind} по теме «${topic}». Язык общения: ${language}.\n\nЗадание: ${title}\nИнструкция: ${instructions}\n${taskText}\n\nПравила помощи: сначала задай мне короткий уточняющий вопрос или попроси показать мою попытку. Не выдавай готовый ответ сразу. Объясняй простыми шагами, дай одну небольшую подсказку, затем предложи мне попробовать самому. Если я покажу ошибку, объясни, где она и как её исправить, но дай мне самому получить итоговый ответ.`;
+}
+function openAiExerciseHelp(kind){
+ const data=window.currentEduKspData||{};
+ const exercise=kind==='home'?data.homework_exercise:data.class_exercise;
+ if(exercise) openAiHelp(exercise,kind==='home'?'домашнее задание':'упражнение в классе',data,data.__lang||document.getElementById('lessonLanguage')?.value||'Русский');
+}
+function copyAiExercisePrompt(kind,button){
+ const data=window.currentEduKspData||{};
+ const exercise=kind==='home'?data.homework_exercise:data.class_exercise;
+ if(exercise) copyAiPrompt(exercise,kind==='home'?'домашнее задание':'упражнение в классе',data,data.__lang||document.getElementById('lessonLanguage')?.value||'Русский',button);
+}
+function openAiHelp(exercise,kind,data,lang){
+ const prompt=aiExercisePrompt(exercise,kind,data,lang);
+ try{navigator.clipboard?.writeText(prompt)}catch(e){}
+ const url='https://chatgpt.com/?q='+encodeURIComponent(prompt);
+ window.open(url,'_blank','noopener,noreferrer');
+}
+function copyAiPrompt(exercise,kind,data,lang,button){
+ const prompt=aiExercisePrompt(exercise,kind,data,lang);
+ navigator.clipboard?.writeText(prompt).then(()=>{const old=button.innerHTML;button.innerHTML='<i class="fa-solid fa-check"></i> Скопировано';setTimeout(()=>button.innerHTML=old,1400)}).catch(()=>promptCopyFallback(prompt));
+}
+function promptCopyFallback(text){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();alert('Учебный запрос скопирован. Откройте ChatGPT и вставьте его.');}
+function renderExerciseCard(exercise,kind,data,lang){
+ if(!exercise||(!exercise.title&&!exercise.instructions&&!exercise.tasks?.length)) return '';
+ const L=getDocLocale(lang||data.__lang||'Русский');
+ const isHome=kind==='home';
+ const heading=isHome?(L.homeExercise||'Домашнее задание с ИИ'):(L.classExercise||'ИИ-упражнение в классе');
+ const ex=exercise;
+ const tasks=(Array.isArray(ex.tasks)?ex.tasks:[]).filter(Boolean).map((t,i)=>`<li style="margin:5px 0">${esc(t)}</li>`).join('');
+ const criteria=(Array.isArray(ex.success_criteria)?ex.success_criteria:[]).filter(Boolean).map(t=>`<li>${esc(t)}</li>`).join('');
+ const uid=(isHome?'home':'class')+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+ const answerId=uid+'_answer';
+ const safePrompt=esc(aiExercisePrompt(ex,isHome?'домашнее задание':'упражнение в классе',data,lang));
+ return `<div class="ai-exercise" data-exercise="${isHome?'home':'class'}"><h4>🤖 ${esc(heading)}: ${esc(ex.title||'')}</h4><div class="ai-task"><strong>${esc(L.instructions||'Инструкция')}:</strong> ${esc(ex.instructions||'')}<ol style="padding-left:20px;margin:8px 0">${tasks}</ol>${criteria?`<strong>${esc(L.successCriteria||'Критерии успеха')}:</strong><ul style="padding-left:20px;margin:6px 0">${criteria}</ul>`:''}${ex.hint?`<div style="margin-top:7px;padding:7px;background:#faf7ff;border-radius:9px"><strong>${esc(L.hint||'Подсказка')}:</strong> ${esc(ex.hint)}</div>`:''}</div><textarea id="${answerId}" class="ai-answer" placeholder="${esc(L.answerPlaceholder||'Выполните задание здесь. Сначала попробуйте самостоятельно…')}"></textarea><div class="ai-actions"><button type="button" class="btn btn-primary text-[10px] py-2" onclick="openAiExerciseHelp('${isHome?'home':'class'}')"><i class="fa-solid fa-robot"></i> ${esc(L.aiHelp||'Помощь ИИ')}</button><button type="button" class="btn btn-soft text-[10px] py-2" onclick="copyAiExercisePrompt('${isHome?'home':'class'}',this)"><i class="fa-regular fa-copy"></i> ${esc(L.copyPrompt||'Скопировать запрос')}</button><a class="btn btn-soft text-[10px] py-2" target="_blank" rel="noopener" href="https://chatgpt.com/"><i class="fa-solid fa-arrow-up-right-from-square"></i> ChatGPT</a></div></div>`;
+}
 function renderDocument(data,showVisuals=true,lang){
+ data.__lang=lang||data.__lang||'Русский';
+ window.currentEduKspData=data;
  const L=getDocLocale(lang||data.__lang||'Русский');
  const learning=Array.isArray(data.learning_objectives)?data.learning_objectives:[data.learning_objectives];
  const lesson=Array.isArray(data.lesson_objectives)?data.lesson_objectives:[data.lesson_objectives];
@@ -302,7 +361,9 @@ function renderDocument(data,showVisuals=true,lang){
  }).join('');
  const integrated=data.integrated_conspect||'';
  const seminarProgram=Array.isArray(data.seminar_program)?data.seminar_program:[];
- const extras=`${integrated?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.integrated)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(integrated)}</div></div>`:''}${data.seminar_script?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.seminarScript)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(data.seminar_script)}</div></div>`:''}${seminarProgram.length?`<div style="margin:12px 0"><strong>${esc(L.seminarProgram)}</strong><table><thead><tr><th>${esc(L.time)}</th><th>${esc(L.block)}</th><th>${esc(L.content)}</th><th>${esc(L.speaker)}</th><th>${esc(L.activity)}</th><th>${esc(L.result)}</th><th>${esc(L.materials)}</th></tr></thead><tbody>${seminarProgram.map(x=>`<tr><td>${esc(x.time)}</td><td>${esc(x.block)}</td><td>${esc(x.content)}</td><td>${esc(x.speaker_text)}</td><td>${esc(x.activity)}</td><td>${esc(x.result)}</td><td>${esc(x.materials)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+ const classExercise=renderExerciseCard(data.class_exercise,'class',data,lang);
+ const homeworkExercise=renderExerciseCard(data.homework_exercise,'home',data,lang);
+ const extras=`${classExercise}${homeworkExercise}${integrated?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.integrated)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(integrated)}</div></div>`:''}${data.seminar_script?`<div style="margin:12px 0;padding:10px;border:1px solid #d9c8d5;background:#fffafc"><strong>${esc(L.seminarScript)}</strong><div style="margin-top:6px;white-space:pre-wrap">${esc(data.seminar_script)}</div></div>`:''}${seminarProgram.length?`<div style="margin:12px 0"><strong>${esc(L.seminarProgram)}</strong><table><thead><tr><th>${esc(L.time)}</th><th>${esc(L.block)}</th><th>${esc(L.content)}</th><th>${esc(L.speaker)}</th><th>${esc(L.activity)}</th><th>${esc(L.result)}</th><th>${esc(L.materials)}</th></tr></thead><tbody>${seminarProgram.map(x=>`<tr><td>${esc(x.time)}</td><td>${esc(x.block)}</td><td>${esc(x.content)}</td><td>${esc(x.speaker_text)}</td><td>${esc(x.activity)}</td><td>${esc(x.result)}</td><td>${esc(x.materials)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
  const safeDate=data.date||new Date().toLocaleDateString(L.date);
  $('documentPreview').dataset.lang=L.code;
  $('documentPreview').dataset.wordName=L.docFile;
